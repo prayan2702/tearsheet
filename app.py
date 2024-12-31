@@ -25,11 +25,15 @@ def preprocess_data(data):
     # Remove rows without NAV
     data = data.dropna(subset=['NAV'])
 
-    # Convert Date to datetime and remove timezone
+    # Convert Date to datetime and sort
     data['Date'] = pd.to_datetime(data['Date'], format='%d-%b-%y')
     data = data.sort_values(by='Date')
     data['Date'] = data['Date'].apply(lambda x: x.replace(tzinfo=None))  # Remove tz awareness
     data.set_index('Date', inplace=True)
+
+    # Fill missing dates
+    all_dates = pd.date_range(start=data.index.min(), end=data.index.max(), freq='D')
+    data = data.reindex(all_dates, method='ffill')
 
     # Convert columns to numeric
     data['NAV'] = pd.to_numeric(data['NAV'])
@@ -48,11 +52,9 @@ def calculate_returns(data):
 
 # Filter data to ensure overlapping date ranges
 def filter_data_by_date(returns, nifty50):
-    start_date = max(returns.index[0], nifty50.index[0])
-    end_date = min(returns.index[-1], nifty50.index[-1])
-
-    returns = returns[start_date:end_date]
-    nifty50 = nifty50[start_date:end_date]
+    common_dates = returns.index.intersection(nifty50.index)
+    returns = returns[common_dates]
+    nifty50 = nifty50[common_dates]
     return returns, nifty50
 
 # Main function for Streamlit app
@@ -87,6 +89,11 @@ def main():
         # Handle NaN and Inf values
         returns = returns.replace([np.inf, -np.inf], 0).fillna(0)
         nifty50 = nifty50.replace([np.inf, -np.inf], 0).fillna(0)
+
+        # Check for flat returns
+        if returns.sum() == 0:
+            st.warning("No significant returns to display. Check NAV data or return calculations.")
+            return
 
         # Generate QuantStats report
         try:
