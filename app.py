@@ -101,22 +101,26 @@ def main():
 
         # st.line_chart(combined_returns)
         # print("Line Chart displayed.")
-        # Display QuantStats report
+         # Display QuantStats report
         st.subheader("QuantStats Report")
         try:
-            # CSS to remove padding
-            remove_padding_css = """
+            # CSS to adjust the width of the iframe and remove padding
+            adjust_width_css = """
                 <style>
                     section.main > div:has(~ footer ) {
                         padding-bottom: 0px;
                     }
+                    iframe {
+                        width: 100% !important;
+                        border: none !important;
+                    }
                 </style>
             """
-            st.markdown(remove_padding_css, unsafe_allow_html=True)
+            st.markdown(adjust_width_css, unsafe_allow_html=True)
             fig = qs.reports.html(returns, nifty50, output="report.html")
             with open("report.html", "r") as f:
                 report_html = f.read()
-            st.components.v1.html(report_html, height=1800, scrolling=True)
+            st.components.v1.html(report_html, height=1600, scrolling=True)
         except Exception as e:
             st.error(f"Error displaying QuantStats report: {e}")
           
