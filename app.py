@@ -7,7 +7,7 @@ import numpy as np
 csv_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTuyGRVZuafIk2s7moScIn5PAUcPYEyYIOOYJj54RXYUeugWmOP0iIToljSEMhHrg_Zp8Vab6YvBJDV/pub?output=csv"
 
 # Load the data into a Pandas DataFrame
-@st.cache_data
+@st.cache_data(ttl=0)  # Caching har baar bypass hoga
 def load_data(csv_url):
     try:
         data = pd.read_csv(csv_url)
