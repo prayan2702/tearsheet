@@ -106,16 +106,15 @@ def main():
         print("Quantstats starting.")
         st.subheader("QuantStats Report")
         try:
-            #fig = qs.plots.snapshot(returns, title="Portfolio Snapshot")
-            #st.pyplot(fig)
-            #print("Quantstats snapshot displayed.")
-            #plt.close(fig)
-            fig = qs.reports.html(returns, nifty50, output="report.html")
-            st.components.v1.html(fig, height=1000, scrolling=True)
-            print("Quantstats report displayed.")
+           fig = qs.reports.html(returns, nifty50, output="report.html")
+           with open("report.html", "r") as f:
+           report_html = f.read()
+           st.components.v1.html(report_html, height=1000, scrolling=True)
+           print("Quantstats report displayed.")
         except Exception as e:
-            st.error(f"Error displaying QuantStats report: {e}")
-            print(f"Error displaying QuantStats report: {e}")
+           st.error(f"Error displaying QuantStats report: {e}")
+           print(f"Error displaying QuantStats report: {e}")
+       st.write("This is the end") #Add a text to check if it is displayed.
 
 if __name__ == "__main__":
     main()
