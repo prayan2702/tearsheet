@@ -102,12 +102,16 @@ def main():
         st.line_chart(combined_returns)
         print("Line Chart displayed.")
 
-        # Display QuantStats report
-        #print("Quantstats starting.")
-        #st.subheader("QuantStats Report")
-        #fig = qs.reports.html(returns, nifty50)
-        #st.components.v1.html(fig, height=1000, scrolling=True)
-        #print("Quantstats displayed.")
+         # Display QuantStats report
+        print("Quantstats starting.")
+        st.subheader("QuantStats Report")
+        try:
+           fig = qs.plots.snapshot(returns, title="Portfolio Snapshot")
+           st.pyplot(fig)
+           print("Quantstats snapshot displayed.")
+        except Exception as e:
+           st.error(f"Error displaying QuantStats snapshot: {e}")
+           print(f"Error displaying QuantStats snapshot: {e}")
 
 if __name__ == "__main__":
     main()
