@@ -90,17 +90,17 @@ def main():
         # Verify if there are overlap in date range and filter it
         returns, nifty50, start_date, end_date = filter_data_by_date(returns, nifty50)
 
-        st.write(f"Data Range: {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}")
-        print("Data range displayed.")
+        # st.write(f"Data Range: {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}")
+        # print("Data range displayed.")
 
-        st.subheader("Portfolio vs Nifty50 Returns")
-        print("Line Chart starting.")
-        # Combine returns and nifty50 into a single DataFrame for plotting
-        combined_returns = pd.DataFrame({'Portfolio': returns, 'Nifty50': nifty50})
-        combined_returns = combined_returns.fillna(0)
+        # st.subheader("Portfolio vs Nifty50 Returns")
+        # print("Line Chart starting.")
+        # # Combine returns and nifty50 into a single DataFrame for plotting
+        # combined_returns = pd.DataFrame({'Portfolio': returns, 'Nifty50': nifty50})
+        # combined_returns = combined_returns.fillna(0)
 
-        st.line_chart(combined_returns)
-        print("Line Chart displayed.")
+        # st.line_chart(combined_returns)
+        # print("Line Chart displayed.")
 
         # Display QuantStats report
         print("Quantstats starting.")
