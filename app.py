@@ -110,7 +110,7 @@ def main():
             #st.pyplot(fig)
             #print("Quantstats snapshot displayed.")
             #plt.close(fig)
-            fig = qs.reports.html(returns, nifty50)
+            fig = qs.reports.html(returns, nifty50, output="report.html")
             st.components.v1.html(fig, height=1000, scrolling=True)
             print("Quantstats report displayed.")
         except Exception as e:
