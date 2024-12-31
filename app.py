@@ -59,49 +59,31 @@ def filter_data_by_date(returns, nifty50):
     start_date = max(returns.index[0], nifty50.index[0])
     end_date = min(returns.index[-1], nifty50.index[-1])
 
-    # Convert start_date and end_date to Timestamp objects
-    start_date = pd.Timestamp(start_date)
-    end_date = pd.Timestamp(end_date)
+    returns = returns.loc[start_date:end_date]
+    nifty50 = nifty50.loc[start_date:end_date]
 
-    # Filter the data to the overlapping date range
-    returns = returns[start_date:end_date]
-    nifty50 = nifty50[start_date:end_date]
     return returns, nifty50
 
-# Display DataFrame
-def display_dataframe(df, title):
-    st.subheader(title)
-    st.dataframe(df)
-
 def main():
-    st.title("Portfolio Performance Dashboard")
-    data = load_data(csv_url)
+    st.set_page_config(layout="wide")  # Set the layout to wide
 
+    data = load_data(csv_url)
     if data is not None:
-        st.write("Raw Data")
-        st.dataframe(data)
         data = preprocess_data(data)
         returns, nifty50 = calculate_returns(data)
         returns, nifty50 = filter_data_by_date(returns, nifty50)
-
-        # Replace NaN and infinite values with 0
-        returns = returns.replace([float('inf'), float('-inf')], 0).fillna(0)
-        nifty50 = nifty50.replace([float('inf'), float('-inf')], 0).fillna(0)
-
-        # Display Data
-        display_dataframe(data, "Clean Data")
-        display_dataframe(returns.to_frame(), "Returns")
-        display_dataframe(nifty50.to_frame(), "Nifty50")
         
-        st.subheader("Performance Report")
+        if not returns.empty and not nifty50.empty:
+            #Generate the full quantstats report
+            report = qs.reports.full(returns, benchmark=nifty50, display=False)
 
-        if st.button('Generate Full Report'):
-            report_html = qs.reports.html(returns, nifty50, title="Portfolio Performance vs Nifty50", output="portfolio_report.html")
-            st.success(f"Portfolio Performance Report Generated.")
-            with open("portfolio_report.html", "r") as f:
-                report_content = f.read()
-            st.components.v1.html(report_content, height=1000, scrolling=True)
-            st.write("To see the saved report, check the left side panel of the file viewer and download the `portfolio_report.html` file to your computer.")
-        
-if __name__ == "__main__":
+            # Display the report using st.components.v1.html
+            st.components.v1.html(report, height=2500, scrolling=True)
+
+        else:
+            st.error("No overlapping data available")
+    else:
+        st.error("Failed to load data.")
+
+if __name__ == '__main__':
     main()
