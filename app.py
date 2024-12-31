@@ -6,6 +6,7 @@ import numpy as np
 import time
 import os
 from IPython import get_ipython
+import matplotlib.pyplot as plt
 
 # Replace with your published CSV link
 csv_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTuyGRVZuafIk2s7moScIn5PAUcPYEyYIOOYJj54RXYUeugWmOP0iIToljSEMhHrg_Zp8Vab6YvBJDV/pub?output=csv"
@@ -78,7 +79,7 @@ def main():
             report = qs.reports.full(returns, benchmark=nifty50, display=False)
 
             # Display the report using st.components.v1.html
-            st.components.v1.html(report, height=2500, scrolling=True)
+            st.components.v1.html(report, height=3000, scrolling=True)
 
         else:
             st.error("No overlapping data available")
