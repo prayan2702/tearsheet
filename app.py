@@ -104,27 +104,19 @@ def main():
         # Display QuantStats report
         st.subheader("QuantStats Report")
         try:
-            # CSS to hide scrollbar
-            hide_scroll_css = """
+            # CSS to remove padding
+            remove_padding_css = """
                 <style>
-                    [data-testid="stVerticalBlock"] {
-                        overflow-y: hidden !important;
-                        overflow-x: hidden !important;
-                    }
                     section.main > div:has(~ footer ) {
-                        padding-bottom: 5px;
-                    }
-                    .main {
-                         overflow: hidden;
+                        padding-bottom: 0px;
                     }
                 </style>
             """
-            st.markdown(hide_scroll_css, unsafe_allow_html=True)
-
+            st.markdown(remove_padding_css, unsafe_allow_html=True)
             fig = qs.reports.html(returns, nifty50, output="report.html")
             with open("report.html", "r") as f:
                 report_html = f.read()
-            st.components.v1.html(report_html, height=3000, scrolling=False)
+            st.components.v1.html(report_html, height=1800, scrolling=True)
         except Exception as e:
             st.error(f"Error displaying QuantStats report: {e}")
           
