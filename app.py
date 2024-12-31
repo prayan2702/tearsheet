@@ -105,11 +105,11 @@ def main():
                 </style>
             """
             st.markdown(adjust_width_css, unsafe_allow_html=True)
-            report = qs.reports.full(returns, nifty50, output="report.html")
-            with open("report.html", "r") as f:
-                 report_html = f.read()
+            report = qs.reports.full(returns, nifty50)
+            # with open("report.html", "r") as f:
+            #      report_html = f.read()
 
-            st.markdown(report_html, unsafe_allow_html=True)
+            # st.markdown(report_html, unsafe_allow_html=True)
 
         except Exception as e:
              st.error(f"Error displaying QuantStats report: {e}")
