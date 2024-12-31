@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import quantstats as qs
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Replace with your published CSV link
 csv_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTuyGRVZuafIk2s7moScIn5PAUcPYEyYIOOYJj54RXYUeugWmOP0iIToljSEMhHrg_Zp8Vab6YvBJDV/pub?output=csv"
@@ -24,16 +25,9 @@ def preprocess_data(data):
     # Drop rows with missing NAV values
     data = data.dropna(subset=['NAV'])
 
-    # Attempt to parse dates with automatic detection
-    try:
-        data['Date'] = pd.to_datetime(data['Date'], infer_datetime_format=True, errors='coerce')
-    except Exception as e:
-        st.error(f"Error parsing dates: {e}")
-        return None
-
-    # Drop rows where date parsing failed
-    data = data.dropna(subset=['Date'])
-    
+    # Convert Date to datetime format
+    data['Date'] = pd.to_datetime(data['Date'], infer_datetime_format=True, errors='coerce')
+    data = data.dropna(subset=['Date'])  # Drop rows with invalid dates
     data = data.sort_values(by='Date')
     data.set_index('Date', inplace=True)
 
@@ -78,27 +72,28 @@ def main():
     data = load_data(csv_url)
     if data is not None:
         processed_data = preprocess_data(data)
-        if processed_data is not None:
-            returns, nifty50 = calculate_returns(processed_data)
+        returns, nifty50 = calculate_returns(processed_data)
 
-            # Debugging: Show processed data
-            st.write("Processed Data (First 10 rows):")
-            st.dataframe(processed_data.head(10))
+        # Debugging: Show processed data
+        st.write("Processed Data (First 10 rows):")
+        st.dataframe(processed_data.head(10))
 
-            # Generate QuantStats report
-            try:
-                qs.reports.html(returns, nifty50, output="report.html")
-                with open("report.html", "r") as f:
-                    report_html = f.read()
+        # Generate QuantStats report
+        try:
+            qs.reports.html(returns, nifty50, output="report.html")
+            with open("report.html", "r") as f:
+                report_html = f.read()
 
-                # Embed the QuantStats report in full width
-                st.components.v1.html(report_html, scrolling=True)
-            except Exception as e:
-                st.error(f"Error displaying QuantStats report: {e}")
+            # Embed the QuantStats report in full width
+            st.components.v1.html(report_html, scrolling=True)
+        except Exception as e:
+            st.error(f"Error displaying QuantStats report: {e}")
 
-            # Plot heatmap directly
-            st.subheader("Returns Heatmap")
-            qs.plots.returns(returns)
+        # Plot heatmap directly
+        st.subheader("Returns Heatmap")
+        plt.figure(figsize=(10, 5))
+        qs.plots.returns(returns)
+        st.pyplot(plt)
 
 if __name__ == "__main__":
     main()
