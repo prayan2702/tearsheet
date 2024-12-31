@@ -14,15 +14,19 @@ csv_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTuyGRVZuafIk2s7moScI
 # Load the data into a Pandas DataFrame
 @st.cache_data
 def load_data(csv_url):
+    print("Loading data...")  # Print when the function is called
     try:
         data = pd.read_csv(csv_url)
+        print("Data loaded successfully.") # Print when data is loaded
     except Exception as e:
         st.error(f"An error occurred: {e}")
+        print(f"Error during data loading: {e}") # Print if an error occurs
         return None
     return data
 
 # Data cleaning and preprocessing
 def preprocess_data(data):
+    print("Preprocessing data...")
     # Delete rows with Portfolio Value, Absolute Gain, Nifty50, Day Change
     rows_to_delete = data[data['Date'].isin(['Portfolio Value', 'Absolute Gain', 'Nifty50', 'Day Change'])].index
     data.drop(rows_to_delete, inplace=True)
@@ -45,46 +49,65 @@ def preprocess_data(data):
     data['Nifty50 Change %'] = data['Nifty50 Change %'].str.rstrip('%').astype('float')/100
 
     # Make a column of Nifty50 NAV
-    data['Nifty50 NAV'] = data['Nifty50 Value'].cumprod()
-
+    data['Nifty50 NAV'] = (1 + data['Nifty50 Change %']).cumprod()
+    print("Data preprocessed successfully.")
     return data
 
 # Calculate the daily returns
 def calculate_returns(data):
+    print("Calculating returns...")
     returns = data['NAV'].pct_change().dropna()
     nifty50 = data['Nifty50 Change %'].dropna()
+    print("Returns calculated successfully.")
     return returns, nifty50
 
 # Verify if there are overlap in date range
 def filter_data_by_date(returns, nifty50):
-    start_date = max(returns.index[0], nifty50.index[0])
-    end_date = min(returns.index[-1], nifty50.index[-1])
+    print("Filtering data by date...")
+    start_date = max(returns.index.min(), nifty50.index.min())
+    end_date = min(returns.index.max(), nifty50.index.max())
 
-    returns = returns.loc[start_date:end_date]
-    nifty50 = nifty50.loc[start_date:end_date]
-
-    return returns, nifty50
-
+    returns = returns[start_date:end_date]
+    nifty50 = nifty50[start_date:end_date]
+    print("Data filtered by date.")
+    return returns, nifty50, start_date, end_date
+# Main function for Streamlit app
 def main():
-    st.set_page_config(layout="wide")  # Set the layout to wide
+    st.title("Portfolio Performance Analysis")
+    print("App title set.")
 
+    # Load data
     data = load_data(csv_url)
+
     if data is not None:
-        data = preprocess_data(data)
-        returns, nifty50 = calculate_returns(data)
-        returns, nifty50 = filter_data_by_date(returns, nifty50)
-        
-        if not returns.empty and not nifty50.empty:
-            #Generate the full quantstats report
-            report = qs.reports.full(returns, benchmark=nifty50, display=False)
+        print("Data not null, proceeding...")
+        # Preprocess data
+        processed_data = preprocess_data(data.copy())
 
-            # Display the report using st.components.v1.html
-            st.components.v1.html(report, height=3000, scrolling=True)
+        # Calculate returns
+        returns, nifty50 = calculate_returns(processed_data)
 
-        else:
-            st.error("No overlapping data available")
-    else:
-        st.error("Failed to load data.")
+        # Verify if there are overlap in date range and filter it
+        returns, nifty50, start_date, end_date = filter_data_by_date(returns, nifty50)
 
-if __name__ == '__main__':
+        st.write(f"Data Range: {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}")
+        print("Data range displayed.")
+
+        st.subheader("Portfolio vs Nifty50 Returns")
+        print("Line Chart starting.")
+        # Combine returns and nifty50 into a single DataFrame for plotting
+        combined_returns = pd.DataFrame({'Portfolio': returns, 'Nifty50': nifty50})
+        combined_returns = combined_returns.fillna(0)
+
+        st.line_chart(combined_returns)
+        print("Line Chart displayed.")
+
+        # Display QuantStats report
+        #print("Quantstats starting.")
+        #st.subheader("QuantStats Report")
+        #fig = qs.reports.html(returns, nifty50)
+        #st.components.v1.html(fig, height=1000, scrolling=True)
+        #print("Quantstats displayed.")
+
+if __name__ == "__main__":
     main()
