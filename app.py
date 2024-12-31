@@ -101,7 +101,7 @@ def main():
 
         # st.line_chart(combined_returns)
         # print("Line Chart displayed.")
-         # Display QuantStats report
+        # Display QuantStats report
         st.subheader("QuantStats Report")
         try:
             # CSS to adjust the width of the iframe and remove padding
@@ -110,20 +110,15 @@ def main():
                     section.main > div:has(~ footer ) {
                         padding-bottom: 0px;
                     }
-                    iframe {
-                        width: 100% !important;
-                        border: none !important;
-                    }
                 </style>
             """
             st.markdown(adjust_width_css, unsafe_allow_html=True)
             fig = qs.reports.html(returns, nifty50, output="report.html")
             with open("report.html", "r") as f:
                 report_html = f.read()
-            st.components.v1.html(report_html, height=1600, scrolling=True)
+            st.markdown(report_html, unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Error displaying QuantStats report: {e}")
-          
         st.write("This is the end") #Add a text to check if it is displayed.
 
 if __name__ == "__main__":
