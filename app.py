@@ -107,7 +107,7 @@ def main():
         st.subheader("QuantStats Report")
         try:
            fig = qs.reports.html(returns, nifty50, output="report.html")
-           with open("report.html", "r") as f:
+        with open("report.html", "r") as f:
            report_html = f.read()
            st.components.v1.html(report_html, height=1000, scrolling=True)
            print("Quantstats report displayed.")
