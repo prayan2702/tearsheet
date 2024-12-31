@@ -73,8 +73,6 @@ def filter_data_by_date(returns, nifty50):
     return returns, nifty50, start_date, end_date
 # Main function for Streamlit app
 def main():
-    # st.title("Portfolio Performance Analysis")
-    # print("App title set.")
 
     # Load data
     data = load_data(csv_url)
@@ -90,8 +88,7 @@ def main():
         # Verify if there are overlap in date range and filter it
         returns, nifty50, start_date, end_date = filter_data_by_date(returns, nifty50)
 
-        # # Display QuantStats report
-        # st.subheader("QuantStats Report")
+        # Display QuantStats report
         try:
             # CSS to adjust the width of the iframe and remove padding
             adjust_width_css = """
@@ -113,7 +110,6 @@ def main():
         except Exception as e:
             st.error(f"Error displaying QuantStats report: {e}")
 
-        st.write("This is the end") #Add a text to check if it is displayed.
 
 if __name__ == "__main__":
     main()
