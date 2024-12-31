@@ -114,7 +114,7 @@ def main():
         except Exception as e:
            st.error(f"Error displaying QuantStats report: {e}")
            print(f"Error displaying QuantStats report: {e}")
-       st.write("This is the end") #Add a text to check if it is displayed.
+        st.write("This is the end") #Add a text to check if it is displayed.
 
 if __name__ == "__main__":
     main()
