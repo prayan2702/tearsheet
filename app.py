@@ -104,7 +104,7 @@ def main():
                     }
                 </style>
             """
-            st.markdown(adjust_width_css, unsafe_allow_html=True)
+            # st.markdown(adjust_width_css, unsafe_allow_html=True)
             report = qs.reports.full(returns, nifty50)
             # with open("report.html", "r") as f:
             #      report_html = f.read()
