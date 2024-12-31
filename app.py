@@ -24,8 +24,16 @@ def preprocess_data(data):
     # Drop rows with missing NAV values
     data = data.dropna(subset=['NAV'])
 
-    # Convert Date to datetime format
-    data['Date'] = pd.to_datetime(data['Date'], format='%Y-%m-%d')
+    # Attempt to parse dates with automatic detection
+    try:
+        data['Date'] = pd.to_datetime(data['Date'], infer_datetime_format=True, errors='coerce')
+    except Exception as e:
+        st.error(f"Error parsing dates: {e}")
+        return None
+
+    # Drop rows where date parsing failed
+    data = data.dropna(subset=['Date'])
+    
     data = data.sort_values(by='Date')
     data.set_index('Date', inplace=True)
 
@@ -70,26 +78,27 @@ def main():
     data = load_data(csv_url)
     if data is not None:
         processed_data = preprocess_data(data)
-        returns, nifty50 = calculate_returns(processed_data)
+        if processed_data is not None:
+            returns, nifty50 = calculate_returns(processed_data)
 
-        # Debugging: Show processed data
-        st.write("Processed Data (First 10 rows):")
-        st.dataframe(processed_data.head(10))
+            # Debugging: Show processed data
+            st.write("Processed Data (First 10 rows):")
+            st.dataframe(processed_data.head(10))
 
-        # Generate QuantStats report
-        try:
-            qs.reports.html(returns, nifty50, output="report.html")
-            with open("report.html", "r") as f:
-                report_html = f.read()
+            # Generate QuantStats report
+            try:
+                qs.reports.html(returns, nifty50, output="report.html")
+                with open("report.html", "r") as f:
+                    report_html = f.read()
 
-            # Embed the QuantStats report in full width
-            st.components.v1.html(report_html, scrolling=True)
-        except Exception as e:
-            st.error(f"Error displaying QuantStats report: {e}")
+                # Embed the QuantStats report in full width
+                st.components.v1.html(report_html, scrolling=True)
+            except Exception as e:
+                st.error(f"Error displaying QuantStats report: {e}")
 
-        # Plot heatmap directly
-        st.subheader("Returns Heatmap")
-        qs.plots.returns(returns)
+            # Plot heatmap directly
+            st.subheader("Returns Heatmap")
+            qs.plots.returns(returns)
 
 if __name__ == "__main__":
     main()
