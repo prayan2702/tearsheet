@@ -101,19 +101,33 @@ def main():
 
         # st.line_chart(combined_returns)
         # print("Line Chart displayed.")
-
         # Display QuantStats report
-        print("Quantstats starting.")
         st.subheader("QuantStats Report")
         try:
-           fig = qs.reports.html(returns, nifty50, output="report.html")
-           with open("report.html", "r") as f:
-             report_html = f.read()
-           st.components.v1.html(report_html, height=1000, scrolling=True)
-           print("Quantstats report displayed.")
+            # CSS to hide scrollbar
+            hide_scroll_css = """
+                <style>
+                    [data-testid="stVerticalBlock"] {
+                        overflow-y: hidden !important;
+                        overflow-x: hidden !important;
+                    }
+                    section.main > div:has(~ footer ) {
+                        padding-bottom: 5px;
+                    }
+                    .main {
+                         overflow: hidden;
+                    }
+                </style>
+            """
+            st.markdown(hide_scroll_css, unsafe_allow_html=True)
+
+            fig = qs.reports.html(returns, nifty50, output="report.html")
+            with open("report.html", "r") as f:
+                report_html = f.read()
+            st.components.v1.html(report_html, height=3000, scrolling=False)
         except Exception as e:
-           st.error(f"Error displaying QuantStats report: {e}")
-           print(f"Error displaying QuantStats report: {e}")
+            st.error(f"Error displaying QuantStats report: {e}")
+          
         st.write("This is the end") #Add a text to check if it is displayed.
 
 if __name__ == "__main__":
