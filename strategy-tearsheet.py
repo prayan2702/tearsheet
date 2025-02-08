@@ -6,6 +6,9 @@ import numpy as np
 # Replace with your published CSV link
 csv_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTuyGRVZuafIk2s7moScIn5PAUcPYEyYIOOYJj54RXYUeugWmOP0iIToljSEMhHrg_Zp8Vab6YvBJDV/pub?output=csv"
 
+# Clear cache before fetching data to ensure fresh data on each run
+st.cache_data.clear()
+
 # Load the data into a Pandas DataFrame
 @st.cache_data(ttl=0)  # Caching har baar bypass hoga
 def load_data(csv_url):
